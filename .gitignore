@@ -4,6 +4,9 @@
 /log/
 /test_results/
 
+# IDE and editor directories
+.vscode/
+
 # Python caches and virtual environments
 __pycache__/
 *.py[cod]
