@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<robot name="soritra">
+	<!--
+		Bras plan pour le dessin :
+			- base_link est le bâti fixe (origine au niveau du sol/de la table) ;
+			- le support place le plan des bras à 0,24 m ;
+			- L1 va de l'épaule au coude (1,0 m) et pivote sur la base ;
+			- L2 mesure 0,8 m et pivote au coude ;
+			- le stylo est orienté vers le bas et expose le repère terminal_xy.
+		Les longueurs des bras sont mesurées entre les axes de leurs joints.
+	-->
+
+	<material name="dark_gray">
+		<color rgba="0.22 0.25 0.29 1"/>
+	</material>
+	<material name="blue">
+		<color rgba="0.12 0.36 0.72 1"/>
+	</material>
+	<material name="orange">
+		<color rgba="0.95 0.43 0.12 1"/>
+	</material>
+	<material name="metal">
+		<color rgba="0.72 0.75 0.78 1"/>
+	</material>
+	<material name="pen_body">
+		<color rgba="0.12 0.12 0.14 1"/>
+	</material>
+	<material name="pen_tip">
+		<color rgba="0.08 0.08 0.08 1"/>
+	</material>
+
+	<link name="world_link"/>
+
+	<joint name="world_to_base" type="fixed">
+		<parent link="world_link"/>
+		<child link="base_link"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint>
+
+	<link name="base_link">
+		<inertial>
+			<origin xyz="0 0 0.02" rpy="0 0 0"/>
+			<mass value="2.0"/>
+			<inertia ixx="0.0165" ixy="0" ixz="0" iyy="0.0165" iyz="0" izz="0.0324"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0.02" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.18" length="0.04"/></geometry>
+			<material name="dark_gray"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0.02" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.18" length="0.04"/></geometry>
+		</collision>
+	</link>
+
+	<link name="support_link">
+		<inertial>
+			<origin xyz="0 0 0.10" rpy="0 0 0"/>
+			<mass value="0.8"/>
+			<inertia ixx="0.0028" ixy="0" ixz="0" iyy="0.0028" iyz="0" izz="0.0010"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0.10" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.045" length="0.20"/></geometry>
+			<material name="metal"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0.10" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.045" length="0.20"/></geometry>
+		</collision>
+	</link>
+
+	<joint name="base_to_support" type="fixed">
+		<parent link="base_link"/>
+		<child link="support_link"/>
+		<origin xyz="0 0 0.04" rpy="0 0 0"/>
+	</joint>
+
+	<link name="L1_link">
+		<inertial>
+			<origin xyz="0.50 0 0" rpy="0 0 0"/>
+			<mass value="1.5"/>
+			<inertia ixx="0.000763" ixy="0" ixz="0" iyy="0.12656" iyz="0" izz="0.12695"/>
+		</inertial>
+		<visual>
+			<origin xyz="0.50 0 0" rpy="0 0 0"/>
+			<geometry><box size="1.0 0.06 0.05"/></geometry>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<origin xyz="0.50 0 0" rpy="0 0 0"/>
+			<geometry><box size="1.0 0.06 0.05"/></geometry>
+		</collision>
+	</link>
+
+	<joint name="shoulder_joint" type="revolute">
+		<parent link="support_link"/>
+		<child link="L1_link"/>
+		<origin xyz="0 0 0.20" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-3.141593" upper="3.141593" effort="20" velocity="1.0"/>
+		<dynamics damping="0.1" friction="0.02"/>
+	</joint>
+
+	<link name="elbow_link">
+		<inertial>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<mass value="0.20"/>
+			<inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0003"/>
+		</inertial>
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.07" length="0.07"/></geometry>
+			<material name="metal"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.07" length="0.07"/></geometry>
+		</collision>
+	</link>
+
+	<joint name="elbow_fixed" type="fixed">
+		<parent link="L1_link"/>
+		<child link="elbow_link"/>
+		<origin xyz="1.0 0 0" rpy="0 0 0"/>
+	</joint>
+
+	<link name="L2_link">
+		<inertial>
+			<origin xyz="0.40 0 0" rpy="0 0 0"/>
+			<mass value="1.2"/>
+			<inertia ixx="0.000502" ixy="0" ixz="0" iyy="0.06420" iyz="0" izz="0.06450"/>
+		</inertial>
+		<visual>
+			<origin xyz="0.40 0 0" rpy="0 0 0"/>
+			<geometry><box size="0.80 0.055 0.045"/></geometry>
+			<material name="orange"/>
+		</visual>
+		<collision>
+			<origin xyz="0.40 0 0" rpy="0 0 0"/>
+			<geometry><box size="0.80 0.055 0.045"/></geometry>
+		</collision>
+	</link>
+
+	<joint name="elbow_joint" type="revolute">
+		<parent link="elbow_link"/>
+		<child link="L2_link"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit lower="-2.617994" upper="2.617994" effort="12" velocity="1.5"/>
+		<dynamics damping="0.1" friction="0.02"/>
+	</joint>
+
+	<link name="outil_link">
+		<inertial>
+			<origin xyz="0 0 -0.10" rpy="0 0 0"/>
+			<mass value="0.12"/>
+			<inertia ixx="0.00015" ixy="0" ixz="0" iyy="0.00015" iyz="0" izz="0.00004"/>
+		</inertial>
+		<!-- Corps de stylo : la pointe peut être remplacée par un outil de perçage. -->
+		<visual>
+			<origin xyz="0 0 -0.095" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.025" length="0.17"/></geometry>
+			<material name="pen_body"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 -0.095" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.025" length="0.17"/></geometry>
+		</collision>
+		<!-- Pointe fine orientée vers le plan de dessin (axe -Z). -->
+		<visual>
+			<origin xyz="0 0 -0.205" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.009" length="0.05"/></geometry>
+			<material name="pen_tip"/>
+		</visual>
+		<collision>
+			<origin xyz="0 0 -0.205" rpy="0 0 0"/>
+			<geometry><cylinder radius="0.009" length="0.05"/></geometry>
+		</collision>
+	</link>
+
+	<joint name="L2_to_outil" type="fixed">
+		<parent link="L2_link"/>
+		<child link="outil_link"/>
+		<origin xyz="0.80 0 0" rpy="0 0 0"/>
+	</joint>
+
+	<!-- Repère à la pointe du stylo : sa position TF donne terminal_X et terminal_Y. -->
+	<link name="terminal_xy"/>
+	<joint name="outil_to_terminal_xy" type="fixed">
+		<parent link="outil_link"/>
+		<child link="terminal_xy"/>
+		<origin xyz="0 0 -0.23" rpy="0 0 0"/>
+	</joint>
+</robot>
